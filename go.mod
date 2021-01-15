@@ -1,4 +1,4 @@
-module mongolib
+module github.com/aeramu/mongolib
 
 go 1.15
 
