@@ -69,7 +69,10 @@ func (q Query) Find(ctx context.Context) Result {
 }
 
 func (q Query) FindOne(ctx context.Context) Result {
-	filter := bson.D{{Key: "&and", Value: q.filter}}
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
 
 	result := q.coll.FindOne(ctx, filter)
 	return &SingleResult{
