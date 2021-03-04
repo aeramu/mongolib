@@ -2,7 +2,6 @@ package mongolib
 
 import (
 	"context"
-	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,10 +13,6 @@ func NewRepository(collection *mongo.Collection) *Repository {
 		Collection: collection,
 	}
 }
-
-var (
-	ErrNotFound = errors.New("result not found")
-)
 
 type Repository struct{
 	*mongo.Collection
@@ -34,26 +29,35 @@ func (repo *Repository) Save(ctx context.Context, id primitive.ObjectID, data in
 	return nil
 }
 
-func (repo *Repository) FindOneByIndex(ctx context.Context, indexName string, indexValue interface{}, v interface{}) error {
+func (repo *Repository) FindOneByIndex(ctx context.Context, indexName string, indexValue interface{}) Result {
 	filter := bson.D{{indexName, indexValue}}
-	err := repo.FindOne(ctx, filter).Decode(v)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return ErrNotFound
-		}
-		return err
+	result := repo.FindOne(ctx, filter)
+	return &SingleResult{
+		SingleResult: result,
 	}
-	return nil
 }
 
-func (repo *Repository) FindByIndex(ctx context.Context, indexName string, indexValue interface{}, v interface{}) error {
+func (repo *Repository) FindAllByIndex(ctx context.Context, indexName string, indexValue interface{}) Result {
 	filter := bson.D{{indexName, indexValue}}
 	cur, err := repo.Find(ctx, filter)
 	if err != nil {
-		return err
+		return &MultipleResult{
+			Cursor: nil,
+			Error: err,
+		}
 	}
-	if err := cur.All(ctx, v); err != nil {
-		return err
+
+	return &MultipleResult{
+		Cursor: cur,
+		Error:  nil,
 	}
-	return nil
+}
+
+func (repo *Repository) Query() Query {
+	return Query{
+		coll:   repo.Collection,
+		filter: bson.A{},
+		limit:  0,
+		sort:   bson.D{},
+	}
 }
