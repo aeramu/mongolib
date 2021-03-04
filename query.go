@@ -3,7 +3,6 @@ package mongolib
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -13,7 +12,7 @@ const (
 )
 
 type Query struct {
-	coll *mongo.Collection
+	coll *Collection
 	filter bson.A
 	limit int
 	sort bson.D

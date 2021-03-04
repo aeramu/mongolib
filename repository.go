@@ -8,30 +8,30 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func NewRepository(collection *mongo.Collection) *Repository {
-	return &Repository{
+func NewRepository(collection *mongo.Collection) *Collection {
+	return &Collection{
 		Collection: collection,
 	}
 }
 
-type Repository struct{
+type Collection struct{
 	*mongo.Collection
 }
 
-func (repo *Repository) Save(ctx context.Context, id primitive.ObjectID, data interface{}) error {
+func (coll *Collection) Save(ctx context.Context, id primitive.ObjectID, data interface{}) error {
 	update := bson.D{{"$set", data}}
 	filter := bson.D{{"_id", id}}
 	opt := options.Update().SetUpsert(true)
 
-	if _, err := repo.UpdateOne(ctx, filter, update, opt); err != nil {
+	if _, err := coll.UpdateOne(ctx, filter, update, opt); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (repo *Repository) Query() Query {
+func (coll *Collection) Query() Query {
 	return Query{
-		coll:   repo.Collection,
+		coll:   coll,
 		filter: bson.A{},
 		limit:  0,
 		sort:   bson.D{},
