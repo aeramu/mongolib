@@ -37,6 +37,7 @@ func (coll *Collection) Query() Query {
 		coll:   coll,
 		filter: bson.A{},
 		limit:  0,
+		offset: 0,
 		sort:   bson.D{},
 	}
 }

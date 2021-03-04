@@ -83,8 +83,35 @@ func (q Query) FindOne(ctx context.Context) Result {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
 	}
 
+	opt := options.FindOne().SetSort(q.sort)
+	if q.offset > 0 {
+		opt = opt.SetSkip(int64(q.offset))
+	}
+
 	result := q.coll.FindOne(ctx, filter)
 	return &SingleResult{
 		SingleResult: result,
 	}
+}
+
+func (q Query) Count(ctx context.Context) (int, error) {
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
+
+	opt := options.Count()
+	if q.offset > 0 {
+		opt = opt.SetSkip(int64(q.offset))
+	}
+	if q.limit > 0 {
+		opt = opt.SetLimit(int64(q.limit))
+	}
+
+	count, err := q.coll.CountDocuments(ctx, filter)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(count), nil
 }
