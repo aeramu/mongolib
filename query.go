@@ -7,6 +7,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const (
+	Ascending = 1
+	Descending = -1
+)
+
 type Query struct {
 	coll *mongo.Collection
 	filter bson.A
@@ -14,13 +19,8 @@ type Query struct {
 	sort bson.D
 }
 
-func (q Query) Asc(key string) Query {
-	q.sort = append(q.sort, bson.E{Key: key, Value: 1})
-	return q
-}
-
-func (q Query) Desc(key string) Query {
-	q.sort = append(q.sort, bson.E{Key: key, Value: -1})
+func (q Query) Sort(key string, order int) Query {
+	q.sort = append(q.sort, bson.E{Key: key, Value: order})
 	return q
 }
 
