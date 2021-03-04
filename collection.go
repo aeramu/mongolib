@@ -12,6 +12,15 @@ type Collection struct {
 	*mongo.Collection
 }
 
+func (coll *Collection) FindByID(ctx context.Context, id primitive.ObjectID) Result {
+	filter := bson.D{{"_id", id}}
+	res := coll.FindOne(ctx, filter)
+
+	return &SingleResult{
+		SingleResult: res,
+	}
+}
+
 func (coll *Collection) Save(ctx context.Context, id primitive.ObjectID, data interface{}) error {
 	update := bson.D{{"$set", data}}
 	filter := bson.D{{"_id", id}}
