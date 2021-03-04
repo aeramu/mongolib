@@ -15,6 +15,7 @@ type Query struct {
 	coll *Collection
 	filter bson.A
 	limit int
+	offset int
 	sort bson.D
 }
 
@@ -43,14 +44,23 @@ func (q Query) Limit(limit int) Query {
 	return q
 }
 
+func (q Query) Offset(offset int) Query {
+	q.offset = offset
+	return q
+}
+
 func (q Query) Find(ctx context.Context) Result {
 	filter := bson.D{}
 	if len(q.filter) > 0 {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
 	}
+
 	opt := options.Find().SetSort(q.sort)
 	if q.limit > 0 {
 		opt = opt.SetLimit(int64(q.limit))
+	}
+	if q.offset > 0 {
+		opt = opt.SetSkip(int64(q.offset))
 	}
 
 	cur, err := q.coll.Find(ctx, filter, opt)
