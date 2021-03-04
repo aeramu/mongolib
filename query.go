@@ -45,9 +45,12 @@ func (q Query) Limit(limit int) Query {
 }
 
 func (q Query) Find(ctx context.Context) Result {
-	filter := bson.D{{Key: "&and", Value: q.filter}}
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
 	opt := options.Find().SetSort(q.sort)
-	if q.limit != 0 {
+	if q.limit > 0 {
 		opt = opt.SetLimit(int64(q.limit))
 	}
 
