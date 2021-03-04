@@ -2,8 +2,8 @@ package mongolib
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-func NewObjectID() string {
-	return primitive.NewObjectID().Hex()
+func NewObjectID() primitive.ObjectID {
+	return primitive.NewObjectID()
 }
 
 func ObjectID(hex string) (objectID primitive.ObjectID) {
