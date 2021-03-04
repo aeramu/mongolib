@@ -29,30 +29,6 @@ func (repo *Repository) Save(ctx context.Context, id primitive.ObjectID, data in
 	return nil
 }
 
-func (repo *Repository) FindOneByIndex(ctx context.Context, indexName string, indexValue interface{}) Result {
-	filter := bson.D{{indexName, indexValue}}
-	result := repo.FindOne(ctx, filter)
-	return &SingleResult{
-		SingleResult: result,
-	}
-}
-
-func (repo *Repository) FindAllByIndex(ctx context.Context, indexName string, indexValue interface{}) Result {
-	filter := bson.D{{indexName, indexValue}}
-	cur, err := repo.Find(ctx, filter)
-	if err != nil {
-		return &MultipleResult{
-			Cursor: nil,
-			Error: err,
-		}
-	}
-
-	return &MultipleResult{
-		Cursor: cur,
-		Error:  nil,
-	}
-}
-
 func (repo *Repository) Query() Query {
 	return Query{
 		coll:   repo.Collection,
