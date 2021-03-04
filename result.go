@@ -3,7 +3,6 @@ package mongolib
 import (
 	"context"
 	"errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -32,8 +31,6 @@ func (r *SingleResult) Consume(v interface{}) error {
 
 type MultipleResult struct {
 	*mongo.Cursor
-	StartCursor primitive.ObjectID
-	EndCursor primitive.ObjectID
 	Error error
 }
 

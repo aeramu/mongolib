@@ -8,13 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func NewRepository(collection *mongo.Collection) *Collection {
-	return &Collection{
-		Collection: collection,
-	}
-}
-
-type Collection struct{
+type Collection struct {
 	*mongo.Collection
 }
 
