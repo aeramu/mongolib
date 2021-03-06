@@ -88,7 +88,7 @@ func (q Query) FindOne(ctx context.Context) Result {
 		opt = opt.SetSkip(int64(q.offset))
 	}
 
-	result := q.coll.FindOne(ctx, filter)
+	result := q.coll.FindOne(ctx, filter, opt)
 	return &SingleResult{
 		SingleResult: result,
 	}
@@ -108,7 +108,7 @@ func (q Query) Count(ctx context.Context) (int, error) {
 		opt = opt.SetLimit(int64(q.limit))
 	}
 
-	count, err := q.coll.CountDocuments(ctx, filter)
+	count, err := q.coll.CountDocuments(ctx, filter, opt)
 	if err != nil {
 		return 0, err
 	}
