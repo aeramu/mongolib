@@ -115,3 +115,31 @@ func (q Query) Count(ctx context.Context) (int, error) {
 
 	return int(count), nil
 }
+
+func (q Query) DeleteOne(ctx context.Context) error {
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
+
+	_, err := q.coll.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (q Query) DeleteMany(ctx context.Context) error {
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
+
+	_, err := q.coll.DeleteMany(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
