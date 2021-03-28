@@ -143,3 +143,19 @@ func (q Query) DeleteMany(ctx context.Context) error {
 
 	return nil
 }
+
+func (q Query) Save(ctx context.Context, data interface{}) error {
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
+
+	opt := options.Update().SetUpsert(true)
+
+	update := bson.D{{"$set", data}}
+	if _, err := q.coll.UpdateOne(ctx, filter, update, opt); err != nil {
+		return err
+	}
+
+	return nil
+}
