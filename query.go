@@ -19,6 +19,8 @@ type Query struct {
 	sort bson.D
 }
 
+// Filter
+
 func (q Query) Sort(key string, order int) Query {
 	q.sort = append(q.sort, bson.E{Key: key, Value: order})
 	return q
@@ -29,13 +31,38 @@ func (q Query) Equal(key string, value interface{}) Query {
 	return q
 }
 
+func (q Query) NotEqual(key string, value interface{}) Query {
+	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$ne", value}}}})
+	return q
+}
+
 func (q Query) GreaterThan(key string, value interface{}) Query {
 	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$gt", value}}}})
 	return q
 }
 
+func (q Query) GreaterThanEqual(key string, value interface{}) Query {
+	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$gte", value}}}})
+	return q
+}
+
 func (q Query) LessThan(key string, value interface{}) Query {
 	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$lt", value}}}})
+	return q
+}
+
+func (q Query) LessThanEqual(key string, value interface{}) Query {
+	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$lte", value}}}})
+	return q
+}
+
+func (q Query) In(key string, value interface{}) Query {
+	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$in", value}}}})
+	return q
+}
+
+func (q Query) NotIn(key string, value interface{}) Query {
+	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$nin", value}}}})
 	return q
 }
 
@@ -48,6 +75,8 @@ func (q Query) Offset(offset int) Query {
 	q.offset = offset
 	return q
 }
+
+// Get Result
 
 func (q Query) Find(ctx context.Context) Result {
 	filter := bson.D{}
