@@ -21,13 +21,13 @@ type Query struct {
 
 // Filter
 
-func (q Query) Sort(key string, order int) Query {
-	q.sort = append(q.sort, bson.E{Key: key, Value: order})
+func (q Query) Equal(key string, value interface{}) Query {
+	q.filter = append(q.filter, bson.D{{Key: key, Value: value}})
 	return q
 }
 
-func (q Query) Equal(key string, value interface{}) Query {
-	q.filter = append(q.filter, bson.D{{Key: key, Value: value}})
+func (q Query) Regex(key string, value interface{}) Query {
+	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$regex", value}}}})
 	return q
 }
 
@@ -63,6 +63,11 @@ func (q Query) In(key string, value interface{}) Query {
 
 func (q Query) NotIn(key string, value interface{}) Query {
 	q.filter = append(q.filter, bson.D{{Key: key, Value: bson.D{{"$nin", value}}}})
+	return q
+}
+
+func (q Query) Sort(key string, order int) Query {
+	q.sort = append(q.sort, bson.E{Key: key, Value: order})
 	return q
 }
 
