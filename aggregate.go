@@ -11,7 +11,7 @@ type Aggregate struct {
 	pipeline mongo.Pipeline
 }
 
-func (a Aggregate) Match(filter Filter) Aggregate {
+func (a Aggregate) Match(filter filter) Aggregate {
 	a.pipeline = append(a.pipeline, bson.D{{"$match", bson.D{{"$and", filter}}}})
 	return a
 }

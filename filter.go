@@ -2,49 +2,53 @@ package mongolib
 
 import "go.mongodb.org/mongo-driver/bson"
 
-type Filter bson.A
+type filter bson.A
 
-func (f Filter) Equal(key string, value interface{}) Filter {
+func Filter() filter {
+	return filter{}
+}
+
+func (f filter) Equal(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: value}})
 	return filter
 }
 
-func (f Filter) Regex(key string, value interface{}) Filter {
+func (f filter) Regex(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$regex", value}}}})
 	return filter
 }
 
-func (f Filter) NotEqual(key string, value interface{}) Filter {
+func (f filter) NotEqual(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$ne", value}}}})
 	return filter
 }
 
-func (f Filter) GreaterThan(key string, value interface{}) Filter {
+func (f filter) GreaterThan(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$gt", value}}}})
 	return filter
 }
 
-func (f Filter) GreaterThanEqual(key string, value interface{}) Filter {
+func (f filter) GreaterThanEqual(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$gte", value}}}})
 	return filter
 }
 
-func (f Filter) LessThan(key string, value interface{}) Filter {
+func (f filter) LessThan(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$lt", value}}}})
 	return filter
 }
 
-func (f Filter) LessThanEqual(key string, value interface{}) Filter {
+func (f filter) LessThanEqual(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$lte", value}}}})
 	return filter
 }
 
-func (f Filter) In(key string, value interface{}) Filter {
+func (f filter) In(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$in", value}}}})
 	return filter
 }
 
-func (f Filter) NotIn(key string, value interface{}) Filter {
+func (f filter) NotIn(key string, value interface{}) filter {
 	filter := append(f, bson.D{{Key: key, Value: bson.D{{"$nin", value}}}})
 	return filter
 }
