@@ -42,7 +42,7 @@ func (a Aggregate) Lookup(from, localField, foreignField, as string) Aggregate {
 }
 
 func (a Aggregate) Exec(ctx context.Context) Result {
-	cur, err := a.coll.Aggregate(ctx, a.pipeline)
+	cur, err := a.coll.Collection.Aggregate(ctx, a.pipeline)
 	if err != nil {
 		return &MultipleResult{
 			Cursor: nil,

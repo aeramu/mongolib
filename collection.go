@@ -41,3 +41,10 @@ func (coll *Collection) Query() Query {
 		sort:   bson.D{},
 	}
 }
+
+func (coll *Collection) Aggregate() Aggregate {
+	return Aggregate{
+		coll:     coll,
+		pipeline: mongo.Pipeline{},
+	}
+}
