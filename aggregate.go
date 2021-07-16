@@ -41,6 +41,11 @@ func (a Aggregate) Lookup(from, localField, foreignField, as string) Aggregate {
 	return a
 }
 
+func (a Aggregate) Unwind(field string) Aggregate {
+	a.pipeline = append(a.pipeline, bson.D{{"$unwind", field}})
+	return a
+}
+
 func (a Aggregate) Exec(ctx context.Context) Result {
 	cur, err := a.coll.Collection.Aggregate(ctx, a.pipeline)
 	if err != nil {
