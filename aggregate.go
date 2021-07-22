@@ -46,6 +46,11 @@ func (a Aggregate) Unwind(field string) Aggregate {
 	return a
 }
 
+func (a Aggregate) AddField(fieldName string, value interface{}) Aggregate {
+	a.pipeline = append(a.pipeline, bson.D{{"$addFields", bson.D{{fieldName, value}}}})
+	return a
+}
+
 func (a Aggregate) Exec(ctx context.Context) Result {
 	cur, err := a.coll.Collection.Aggregate(ctx, a.pipeline)
 	if err != nil {
