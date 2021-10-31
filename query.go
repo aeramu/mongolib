@@ -193,3 +193,35 @@ func (q Query) Save(ctx context.Context, data interface{}) error {
 
 	return nil
 }
+
+func (q Query) UpdateOne(ctx context.Context, key string, value interface{}) error {
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
+
+	opt := options.Update().SetUpsert(true)
+
+	update := bson.D{{"$set", bson.D{{key, value}}}}
+	if _, err := q.coll.UpdateOne(ctx, filter, update, opt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (q Query) UpdateMany(ctx context.Context, key string, value interface{}) error {
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
+
+	opt := options.Update().SetUpsert(true)
+
+	update := bson.D{{"$set", bson.D{{key, value}}}}
+	if _, err := q.coll.UpdateMany(ctx, filter, update, opt); err != nil {
+		return err
+	}
+
+	return nil
+}
