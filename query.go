@@ -12,11 +12,12 @@ const (
 )
 
 type Query struct {
-	coll *Collection
+	coll   *Collection
 	filter bson.A
-	limit int
+	limit  int
 	offset int
-	sort bson.D
+	sort   bson.D
+	update bson.D
 }
 
 // Filter
@@ -81,7 +82,31 @@ func (q Query) Offset(offset int) Query {
 	return q
 }
 
-// Get Result
+
+// Update Operation
+
+func (q Query) Set(key string, value interface{}) Query {
+	q.update = append(q.update, bson.E{Key: "$set", Value: bson.D{{Key: key, Value: value}}})
+	return q
+}
+
+func (q Query) Inc(key string, value int) Query {
+	q.update = append(q.update, bson.E{Key: "$inc", Value: bson.D{{Key: key, Value: value}}})
+	return q
+}
+
+func (q Query) Push(key string, value ...interface{}) Query {
+	q.update = append(q.update, bson.E{Key: "$push", Value: bson.D{{Key: key, Value: bson.D{{Key: "$each", Value: value}}}}})
+	return q
+}
+
+func (q Query) Pull(key string, value ...interface{}) Query {
+	q.update = append(q.update, bson.E{Key: "$pull", Value: bson.D{{Key: key, Value: bson.D{{Key: "$in", Value: value}}}}})
+	return q
+}
+
+
+// Execute
 
 func (q Query) Find(ctx context.Context) Result {
 	filter := bson.D{}
@@ -150,21 +175,38 @@ func (q Query) Count(ctx context.Context) (int, error) {
 	return int(count), nil
 }
 
-func (q Query) DeleteOne(ctx context.Context) error {
+func (q Query) Save(ctx context.Context, data interface{}) error {
 	filter := bson.D{}
 	if len(q.filter) > 0 {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
 	}
 
-	_, err := q.coll.DeleteOne(ctx, filter)
-	if err != nil {
+	opt := options.Update()
+
+	update := bson.D{{"$set", data}}
+	if _, err := q.coll.UpdateMany(ctx, filter, update, opt); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (q Query) DeleteMany(ctx context.Context) error {
+func (q Query) Update(ctx context.Context) error {
+	filter := bson.D{}
+	if len(q.filter) > 0 {
+		filter = bson.D{{Key: "$and", Value: q.filter}}
+	}
+
+	opt := options.Update()
+
+	if _, err := q.coll.UpdateMany(ctx, filter, q.update, opt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (q Query) Delete(ctx context.Context) error {
 	filter := bson.D{}
 	if len(q.filter) > 0 {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
@@ -172,54 +214,6 @@ func (q Query) DeleteMany(ctx context.Context) error {
 
 	_, err := q.coll.DeleteMany(ctx, filter)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (q Query) Save(ctx context.Context, data interface{}) error {
-	filter := bson.D{}
-	if len(q.filter) > 0 {
-		filter = bson.D{{Key: "$and", Value: q.filter}}
-	}
-
-	opt := options.Update().SetUpsert(true)
-
-	update := bson.D{{"$set", data}}
-	if _, err := q.coll.UpdateOne(ctx, filter, update, opt); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (q Query) UpdateOne(ctx context.Context, key string, value interface{}) error {
-	filter := bson.D{}
-	if len(q.filter) > 0 {
-		filter = bson.D{{Key: "$and", Value: q.filter}}
-	}
-
-	opt := options.Update().SetUpsert(true)
-
-	update := bson.D{{"$set", bson.D{{key, value}}}}
-	if _, err := q.coll.UpdateOne(ctx, filter, update, opt); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (q Query) UpdateMany(ctx context.Context, key string, value interface{}) error {
-	filter := bson.D{}
-	if len(q.filter) > 0 {
-		filter = bson.D{{Key: "$and", Value: q.filter}}
-	}
-
-	opt := options.Update().SetUpsert(true)
-
-	update := bson.D{{"$set", bson.D{{key, value}}}}
-	if _, err := q.coll.UpdateMany(ctx, filter, update, opt); err != nil {
 		return err
 	}
 
