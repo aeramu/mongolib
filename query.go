@@ -181,7 +181,7 @@ func (q Query) Save(ctx context.Context, data interface{}) error {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
 	}
 
-	opt := options.Update()
+	opt := options.Update().SetUpsert(true)
 
 	update := bson.D{{"$set", data}}
 	if _, err := q.coll.UpdateMany(ctx, filter, update, opt); err != nil {
@@ -197,7 +197,7 @@ func (q Query) Update(ctx context.Context) error {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
 	}
 
-	opt := options.Update()
+	opt := options.Update().SetUpsert(true)
 
 	if _, err := q.coll.UpdateMany(ctx, filter, q.update, opt); err != nil {
 		return err
