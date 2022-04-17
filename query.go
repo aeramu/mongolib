@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	Ascending = 1
+	Ascending  = 1
 	Descending = -1
 )
 
@@ -82,7 +82,6 @@ func (q Query) Offset(offset int) Query {
 	return q
 }
 
-
 // Update Operation
 
 func (q Query) Set(key string, value interface{}) Query {
@@ -105,7 +104,6 @@ func (q Query) Pull(key string, value ...interface{}) Query {
 	return q
 }
 
-
 // Execute
 
 func (q Query) Find(ctx context.Context) Result {
@@ -126,7 +124,7 @@ func (q Query) Find(ctx context.Context) Result {
 	if err != nil {
 		return &MultipleResult{
 			Cursor: nil,
-			Error: err,
+			Error:  err,
 		}
 	}
 
@@ -181,7 +179,7 @@ func (q Query) Save(ctx context.Context, data interface{}) error {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
 	}
 
-	opt := options.Update()
+	opt := options.Update().SetUpsert(true)
 
 	update := bson.D{{"$set", data}}
 	if _, err := q.coll.UpdateMany(ctx, filter, update, opt); err != nil {
@@ -197,7 +195,7 @@ func (q Query) Update(ctx context.Context) error {
 		filter = bson.D{{Key: "$and", Value: q.filter}}
 	}
 
-	opt := options.Update()
+	opt := options.Update().SetUpsert(true)
 
 	if _, err := q.coll.UpdateMany(ctx, filter, q.update, opt); err != nil {
 		return err
